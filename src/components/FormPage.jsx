@@ -1,46 +1,119 @@
 import React from "react";
 import Table from "./Table";
+import axios from "axios";
 
 class FormPage extends React.Component {
     constructor(props) {
         super(props);
         this.state = { 
-            toDoList :[
-                {
-                    id:1,
-                    date:"2021-11-18",
-                    todo:"Intro ReactJS",
-                    location:"https://images.unsplash.com/photo-1563461660947-507ef49e9c47?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1074&q=80",
-                    note:"Prepare VSCode, NodeJS and CRA",
-                    status:"Done"
-                }
-            ]
+            date: "",
+            todo: "",
+            location:"",
+            note:"",
+            status:"",
+            selectedIdx:null,
+            toDoList :[]
          }
         }
-        
-        
-    btnSubmit =()=>{
-        let toDoList=this.state.toDoList
-        toDoList.push({
-            date : this.refs.date.value,
-            todo : this.refs.todo.value,
-            location : this.refs.location.value,
-            note : this.refs.note.value,
-            status : "Done"
-        })
-        console.log(this.state.toDoList)
-        this.setState({toDoList})
-        console.log(toDoList)
-        this.refs.date.value="";
-        this.refs.todo.value="";
-        this.refs.location.value="";
-        this.refs.note.value="";
-
-        
+         
+    // menjalankan sebuah fungsi secara otomatis, pertama kali saat component atau page react js di render
+    componentDidMount(){
+        // fungsi yg digunakan untuk melakukan request data pertama kali ke backend
+        this.getData();
     }
+
+    getData = () =>{
+        //Axios : melakukan request data ke banck-end atau API;
+        axios.get("http://localhost:2000/todoList")
+        .then((response)=>{
+            console.log(response.data)
+            // save data response kedalam state
+            this.setState({toDoList:response.data})
+        })
+        .catch((err)=>{console.log(err)})
+    }
+
+    btnSubmit =()=>{
+        let {date,todo,location,note}=this.state;
+        axios.post("http://localhost:2000/todoList", {
+            date,
+            todo,
+            location,
+            note,
+            status:"On Going"
+        }).then((response)=>{
+            // memanggil data terbaru untuk memperbarui data pada state
+            this.getData()
+            this.refs.date.value="";
+            this.refs.todo.value="";
+            this.refs.location.value="";
+            this.refs.note.value="";
+        })
+
+        .catch((error)=>{
+            console.log(error)
+        })
+    }
+
+    btnEdit =(idx) =>{
+        this.setState({ selectedIdx:idx })
+    }
+
+    btnDelete=(idx)=>{
+        let temp = this.state.toDoList;
+        temp.splice(idx,1)
+        this.setState({ toDoList:temp})
+
+    }
+
+    
 
     printData = () =>{
         return this.state.toDoList.map((value,index)=>{
+            if(this.state.selectedIdx == index){
+            return (
+                <div className="modal fade" id="edit" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div className="modal-dialog">
+                                <div className="modal-content">
+                                    <div className="modal-header">
+                                        <h5 className="modal-title" id="exampleModalLabel">Add Produt</h5>
+                                        <button type="button" className="btn close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div className="modal-body">
+                                    <form>
+                                        <div className="form-group">
+                                        <label for="date">Date
+                                            <input className="form-control" id="date" type="date" onChange={(event)=> this.handleInput(event.target.value, "editdate")}/>
+                                        </label>
+                                        </div>
+                                        <div className="form-group">
+                                        <label for="todo">To Do
+                                            <input className="form-control" id="todo"type="text" defaultValue={value.todo} onChange={(event)=> this.handleInput(event.target.value, "editTodo")}/>
+                                        </label>    
+                                        </div>
+                                        <div className="form-group">
+                                        <label for="location">Location
+                                            <input className="form-control" id="location"type="text" defaultValue={value.location} onChange={(event)=> this.handleInput(event.target.value, "editLocation")}/>
+                                        </label>
+                                        </div>
+                                        <div className="form-group">
+                                        <label for="note">Note
+                                            <textarea className="form-control" id="note"type="text" defaultValue={value.note} onChange={(event)=> this.handleInput(event.target.value, "note")}/>
+                                        </label>
+                                    </div>
+                                    </form>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        <button type="button" class="btn btn-primary" onClick={this.btnSubmit}>Save changes</button>
+                                    </div>
+                                </div>
+                             </div>
+                        </div>
+                    </div>
+            )
+        }else {
             return (
                 <tr>
                     <td>{index+1}</td>
@@ -49,44 +122,88 @@ class FormPage extends React.Component {
                     <td><img src={value.location} width="25%" alt="..."/></td>
                     <td>{value.note}</td>
                     <td>{value.status}</td>
+                    <td>
+                        <button className="btn btn-warning" data-toggle="modal" data-target="#edit" type="button" onClick={()=> this.btnEdit(index)}>Edit</button>
+                        <button className="btn btn-danger" type="button" onClick={()=> this.btnDelete(index)}>Delete</button>
+                    </td>
                 </tr>
-            )
+        )
+
+        }
         })
     }
 
+    // handle input per-element
+    // handleInput =(event) =>{
+    //     this.setState({ date: event.target.value})
+    // }
+
+    // handle dinamis bisa digunakan ke semua element input
+    handleInput = (value,propState) =>{
+        this.setState({ [propState]:value})
+
+    }
 
 
     render() { 
     return (
-            <div className="container-fluid d-flex">
-                <div className="row">
-                    <div className="col-2">
-                    <form className="m-2">
-                        <label for="date">Date
-                        <input id="date" type="date" ref="date"/>
-                        </label>
-                        <label for="todo">To Do
-                        <input id="todo"type="text" ref="todo" />
-                        </label>
-                        <label for="location">Location
-                        <input id="location" type="text" ref="location" />
-                        </label>
-                        <label for="note">Note
-                        <textarea id="note" type="text" ref="note"/>
-                        </label>
-                        <button type="button"className="btn btn-primary mt-2" onClick={this.btnSubmit}> Submit</button>
-                    </form>
-                    </div>
+        <div className="container-fluid">
+            <div className="container-fluid d-flex justify-content-end my-2">
+            <button type="button" className="btn btn-primary" data-toggle="modal" data-target="#addProduct">
+                Add Product
+            </button>
+            <div className="modal fade" id="addProduct" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div className="modal-dialog">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h5 className="modal-title" id="exampleModalLabel">Add Product</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div className="modal-body">
+                        
 
+                        <form>
+                            <div className="form-group">
+                                <label for="date">Date
+                                    <input className="form-control" id="date" type="date" onChange={(event)=> this.handleInput(event.target.value, "date")} ref="date"/>
+                                </label>
+                            </div>
+                            <div className="form-group">
+                                <label for="todo">To Do
+                                    <input className="form-control" id="todo"type="text" onChange={(event)=> this.handleInput(event.target.value, "todo")} ref="todo"/>
+                                </label>    
+                            </div>
+                            <div className="form-group">
+                                <label for="location">Location
+                                    <input className="form-control" id="location" type="text" onChange={(event)=> this.handleInput(event.target.value, "location")} ref="location"/>
+                                </label>
+                            </div>
+                            <div className="form-group">
+                                <label for="note">Note
+                                    <textarea className="form-control" id="note" type="text" onChange={(event)=> this.handleInput(event.target.value, "note")} ref="note"/>
+                                </label>
+                            </div>
+                        </form>
+                        <div className="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" onClick={this.btnSubmit}>Save changes</button>
+                        </div>
+                        </div>
+                    </div>
                 </div>
-                <div className="col-10 ">
+            </div>
+            </div>
+            <div className="table">
                     <Table cetak={this.printData()}/>
-                </div>
+            </div>
+                
 
             
                 
-            </div>
-         );
+        </div>
+        );
     }
 }
  

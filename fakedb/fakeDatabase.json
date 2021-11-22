@@ -1,0 +1,36 @@
+{
+  "todoList": [
+    {
+      "id": 1,
+      "date": "2021-11-18",
+      "todo": "Intro ReactJS",
+      "location": "https://images.unsplash.com/photo-1563461660947-507ef49e9c47?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1074&q=80",
+      "note": "Prepare VSCode, NodeJS and CRA",
+      "status": "Done"
+    },
+    {
+      "date": "2021-11-30",
+      "todo": "Liburan",
+      "location": "https://images.unsplash.com/photo-1558005530-a7958896ec60?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1171&q=80",
+      "note": "Bali",
+      "status": "On Going",
+      "id": 2
+    },
+    {
+      "date": "2021-12-01",
+      "todo": "balapan",
+      "location": "https://images.unsplash.com/photo-1532444458054-01a7dd3e9fca?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1241&q=80",
+      "note": "stadion",
+      "status": "On Going",
+      "id": 3
+    },
+    {
+      "date": "2021-11-23",
+      "todo": "coding",
+      "location": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NHx8Y29kaW5nfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60",
+      "note": "",
+      "status": "On Going",
+      "id": 4
+    }
+  ]
+}
