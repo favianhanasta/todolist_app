@@ -1,6 +1,8 @@
 import React from "react";
 import Table from "./Table";
 import axios from "axios";
+import ModalAdd from "./ModalAdd";
+import ModalEdit from "./ModalEdit";
 
 class FormPage extends React.Component {
     constructor(props) {
@@ -44,10 +46,12 @@ class FormPage extends React.Component {
         }).then((response)=>{
             // memanggil data terbaru untuk memperbarui data pada state
             this.getData()
-            this.refs.date.value="";
-            this.refs.todo.value="";
-            this.refs.location.value="";
-            this.refs.note.value="";
+            this.setState({
+                date: "",
+                todo: "",
+                location:"",
+                note:"",
+            })
         })
 
         .catch((error)=>{
@@ -70,50 +74,6 @@ class FormPage extends React.Component {
 
     printData = () =>{
         return this.state.toDoList.map((value,index)=>{
-            if(this.state.selectedIdx == index){
-            return (
-                <div className="modal fade" id="edit" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                            <div className="modal-dialog">
-                                <div className="modal-content">
-                                    <div className="modal-header">
-                                        <h5 className="modal-title" id="exampleModalLabel">Add Produt</h5>
-                                        <button type="button" className="btn close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                    <div className="modal-body">
-                                    <form>
-                                        <div className="form-group">
-                                        <label for="date">Date
-                                            <input className="form-control" id="date" type="date" onChange={(event)=> this.handleInput(event.target.value, "editdate")}/>
-                                        </label>
-                                        </div>
-                                        <div className="form-group">
-                                        <label for="todo">To Do
-                                            <input className="form-control" id="todo"type="text" defaultValue={value.todo} onChange={(event)=> this.handleInput(event.target.value, "editTodo")}/>
-                                        </label>    
-                                        </div>
-                                        <div className="form-group">
-                                        <label for="location">Location
-                                            <input className="form-control" id="location"type="text" defaultValue={value.location} onChange={(event)=> this.handleInput(event.target.value, "editLocation")}/>
-                                        </label>
-                                        </div>
-                                        <div className="form-group">
-                                        <label for="note">Note
-                                            <textarea className="form-control" id="note"type="text" defaultValue={value.note} onChange={(event)=> this.handleInput(event.target.value, "note")}/>
-                                        </label>
-                                    </div>
-                                    </form>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                        <button type="button" class="btn btn-primary" onClick={this.btnSubmit}>Save changes</button>
-                                    </div>
-                                </div>
-                             </div>
-                        </div>
-                    </div>
-            )
-        }else {
             return (
                 <tr>
                     <td>{index+1}</td>
@@ -124,12 +84,10 @@ class FormPage extends React.Component {
                     <td>{value.status}</td>
                     <td>
                         <button className="btn btn-warning" data-toggle="modal" data-target="#edit" type="button" onClick={()=> this.btnEdit(index)}>Edit</button>
-                        <button className="btn btn-danger" type="button" onClick={()=> this.btnDelete(index)}>Delete</button>
+                        <button className="btn btn-danger my-2" type="button" onClick={()=> this.btnDelete(index)}>Delete</button>
                     </td>
                 </tr>
         )
-
-        }
         })
     }
 
@@ -144,59 +102,30 @@ class FormPage extends React.Component {
 
     }
 
+    btnCancel =()=>{
+        this.setState({selectedIdx:null})
+    }
 
     render() { 
     return (
         <div className="container-fluid">
-            <div className="container-fluid d-flex justify-content-end my-2">
-            <button type="button" className="btn btn-primary" data-toggle="modal" data-target="#addProduct">
-                Add Product
-            </button>
-            <div className="modal fade" id="addProduct" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div className="modal-dialog">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <h5 className="modal-title" id="exampleModalLabel">Add Product</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div className="modal-body">
-                        
-
-                        <form>
-                            <div className="form-group">
-                                <label for="date">Date
-                                    <input className="form-control" id="date" type="date" onChange={(event)=> this.handleInput(event.target.value, "date")} ref="date"/>
-                                </label>
-                            </div>
-                            <div className="form-group">
-                                <label for="todo">To Do
-                                    <input className="form-control" id="todo"type="text" onChange={(event)=> this.handleInput(event.target.value, "todo")} ref="todo"/>
-                                </label>    
-                            </div>
-                            <div className="form-group">
-                                <label for="location">Location
-                                    <input className="form-control" id="location" type="text" onChange={(event)=> this.handleInput(event.target.value, "location")} ref="location"/>
-                                </label>
-                            </div>
-                            <div className="form-group">
-                                <label for="note">Note
-                                    <textarea className="form-control" id="note" type="text" onChange={(event)=> this.handleInput(event.target.value, "note")} ref="note"/>
-                                </label>
-                            </div>
-                        </form>
-                        <div className="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" onClick={this.btnSubmit}>Save changes</button>
-                        </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            </div>
+            <ModalAdd
+            handleInput={this.handleInput}
+            date={this.state.date}
+            todo={this.state.todo}
+            location={this.state.location}
+            note={this.state.note}
+            btSubmit={this.btnSubmit}/>
+        {
+            this.state.toDoList.length > 0 && this.state.selectedIdx != null ?
+            <ModalEdit 
+                selectedId ={ this.state.selectedIdx}
+                toDoList = {this.state.toDoList}
+                btCancel = {this.btnCancel}
+            /> :null
+        }
             <div className="table">
-                    <Table cetak={this.printData()}/>
+                <Table cetak={this.printData()}/>
             </div>
                 
 
